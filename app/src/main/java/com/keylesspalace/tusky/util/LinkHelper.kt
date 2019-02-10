@@ -50,7 +50,8 @@ private const val TAG = "LinkHelper"
  * @param mentions any '@' mentions which are known to be in the content
  * @param listener to notify about particular spans that are clicked
  */
-fun setClickableText(view: TextView, content: Spanned, mentions: Array<Status.Mention>?, listener: LinkListener) {
+fun setClickableText(view: TextView, content: Spanned, mentions: Array<Status.Mention>?,
+                     listener: LinkListener) {
     val builder = SpannableStringBuilder(content)
     highlightSpans(builder, view.linkTextColors.defaultColor)
     val urlSpans = builder.getSpans(0, content.length, URLSpan::class.java)
