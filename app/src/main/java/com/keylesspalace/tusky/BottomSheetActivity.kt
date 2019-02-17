@@ -24,7 +24,7 @@ import android.widget.LinearLayout
 import com.keylesspalace.tusky.entity.SearchResults
 import com.keylesspalace.tusky.entity.Status
 import com.keylesspalace.tusky.network.MastodonApi
-import com.keylesspalace.tusky.util.openLink
+import com.keylesspalace.tusky.util.LinkHelper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -85,7 +85,7 @@ abstract class BottomSheetActivity : BaseActivity() {
                     val searchResult = response.body()
                     if(searchResult != null) {
                         if (searchResult.statuses.isNotEmpty()) {
-                            viewThread(searchResult.statuses[0])
+                            viewThread(searchResult.statuses[0].id, searchResult.statuses[0].url)
                             return
                         } else if (searchResult.accounts.isNotEmpty()) {
                             viewAccount(searchResult.accounts[0].id)
@@ -107,11 +107,11 @@ abstract class BottomSheetActivity : BaseActivity() {
         onBeginSearch(url)
     }
 
-    open fun viewThread(status: Status) {
+    open fun viewThread(statusId: String, url: String?) {
         if (!isSearching()) {
             val intent = Intent(this, ViewThreadActivity::class.java)
-            intent.putExtra("id", status.actionableId)
-            intent.putExtra("url", status.actionableStatus.url)
+            intent.putExtra("id", statusId)
+            intent.putExtra("url", url)
             startActivityWithSlideInAnimation(intent)
         }
     }
@@ -156,7 +156,7 @@ abstract class BottomSheetActivity : BaseActivity() {
 
     @VisibleForTesting
     open fun openLink(url: String) {
-        openLink(url, this)
+        LinkHelper.openLink(url, this)
     }
 
     private fun showQuerySheet() {

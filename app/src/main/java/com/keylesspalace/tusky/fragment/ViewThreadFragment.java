@@ -137,13 +137,13 @@ public final class ViewThreadFragment extends SFragment implements
         View rootView = inflater.inflate(R.layout.fragment_view_thread, container, false);
 
         Context context = getContext();
-        swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.tusky_blue);
         swipeRefreshLayout.setProgressBackgroundColorSchemeColor(
                 ThemeUtils.getColor(context, android.R.attr.colorBackground));
 
-        recyclerView = rootView.findViewById(R.id.recycler_view);
+        recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
@@ -254,7 +254,6 @@ public final class ViewThreadFragment extends SFragment implements
     public void onFavourite(final boolean favourite, final int position) {
         final Status status = statuses.get(position);
 
-
         timelineCases.favourite(statuses.get(position), favourite)
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this)))
@@ -270,26 +269,28 @@ public final class ViewThreadFragment extends SFragment implements
     private void updateStatus(int position, Status status) {
         if(position >= 0 && position < statuses.size()) {
 
-            statuses.set(position, status);
+            Status actionableStatus = status.getActionableStatus();
 
-            if(position == statusIndex && card != null) {
-                StatusViewData.Concrete viewData = new StatusViewData.Builder(statuses.getPairedItem(position))
-                        .setCard(card)
-                        .createStatusViewData();
-                statuses.setPairedItem(position, viewData);
-            }
-            adapter.setItem(position, statuses.getPairedItem(position), true);
+            StatusViewData.Concrete viewData = new StatusViewData.Builder(statuses.getPairedItem(position))
+                    .setReblogged(actionableStatus.getReblogged())
+                    .setReblogsCount(actionableStatus.getReblogsCount())
+                    .setFavourited(actionableStatus.getFavourited())
+                    .setFavouritesCount(actionableStatus.getFavouritesCount())
+                    .createStatusViewData();
+            statuses.setPairedItem(position, viewData);
+
+            adapter.setItem(position, viewData, true);
 
         }
     }
 
     @Override
-    public void onMore(View view, int position) {
+    public void onMore(@NonNull View view, int position) {
         super.more(statuses.get(position), view, position);
     }
 
     @Override
-    public void onViewMedia(int position, int attachmentIndex, View view) {
+    public void onViewMedia(int position, int attachmentIndex, @NonNull View view) {
         Status status = statuses.get(position);
         super.viewMedia(attachmentIndex, status, view);
     }

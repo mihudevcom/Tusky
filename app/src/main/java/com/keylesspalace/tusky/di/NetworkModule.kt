@@ -46,8 +46,9 @@ import javax.inject.Singleton
 
 @Module
 class NetworkModule {
+
     @Provides
-    @IntoMap()
+    @IntoMap
     @ClassKey(Spanned::class)
     fun providesSpannedTypeAdapter(): JsonDeserializer<*> = SpannedTypeAdapter()
 
